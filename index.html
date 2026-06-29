@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kopi Nusantara — Dari Bumi, Untuk Jiwa</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <nav id="navbar">
+      <a class="nav-logo" href="#"> ☕ Kopi Nusantara </a>
+
+      <ul class="nav-links">
+        <li><a href="#about">Tentang</a></li>
+        <li><a href="#menu">Menu</a></li>
+        <li><a href="#galeri">Galeri</a></li>
+        <li><a href="#testimoni">Ulasan</a></li>
+        <li><a href="#info">Lokasi</a></li>
+      </ul>
+
+      <a class="nav-cta" href="#reservasi"> Reservasi </a>
+
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </nav>
+
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="#about" onclick="closeMenu()">Tentang</a>
+      <a href="#menu" onclick="closeMenu()">Menu</a>
+      <a href="#galeri" onclick="closeMenu()">Galeri</a>
+      <a href="#testimoni" onclick="closeMenu()">Ulasan</a>
+      <a href="#reservasi" onclick="closeMenu()">Reservasi</a>
+      <a href="#info" onclick="closeMenu()">Lokasi</a>
+    </div>
+
+    <section id="hero">
+      <div class="hero-bg"></div>
+
+      <div class="steam-wrap">
+        <div class="steam"></div>
+        <div class="steam"></div>
+        <div class="steam"></div>
+      </div>
+
+      <div class="hero-content fade-up">
+        <p class="hero-eyebrow">Kopi Nusantara — Est. 2018</p>
+
+        <h1 class="hero-title">
+          Setiap tegukan<br />
+          adalah <em>perjalanan</em>
+        </h1>
+
+        <p class="hero-sub">
+          Kami menyajikan kopi pilihan dari pegunungan Nusantara — Aceh, Flores,
+          Toraja — dengan racikan yang jujur dan penuh rasa.
+        </p>
+
+        <div class="hero-actions">
+          <a href="#menu" class="btn-primary"> Lihat Menu </a>
+
+          <a href="#reservasi" class="btn-ghost"> Pesan Meja </a>
+        </div>
+
+        <div class="hero-stats">
+          <div class="stat">
+            <div class="stat-num">6+</div>
+            <div class="stat-label">Tahun Berdiri</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-num">40+</div>
+            <div class="stat-label">Varian Menu</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-num">4.9</div>
+            <div class="stat-label">Rating Google</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-num">12K+</div>
+            <div class="stat-label">Pelanggan Setia</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="about">
+      <div class="about-visual fade-up">
+        <div class="about-card">
+          <span class="about-icon"> 🏔️ </span>
+
+          <div class="about-card-title">Biji Kopi Langsung dari Petani</div>
+
+          <p style="font-size: 0.88rem; color: var(--muted); line-height: 1.6">
+            Kami berkolaborasi langsung dengan petani di Gayo, Bajawa, dan
+            Toraja. Tanpa perantara, tanpa kompromi soal kualitas.
+          </p>
+
+          <div class="about-badge">Farm to Cup</div>
+        </div>
+      </div>
+
+      <div class="about-text fade-up">
+        <p class="section-eyebrow">Tentang Kami</p>
+
+        <h2 class="section-title">Lebih dari sekadar kafe</h2>
+
+        <p class="section-desc">
+          Kopi Nusantara lahir dari kecintaan terhadap kopi lokal dan keinginan
+          mengangkat cita rasa Indonesia ke panggung yang lebih luas.
+        </p>
+
+        <br />
+
+        <ul class="feature-list">
+          <li>Biji kopi single origin dari 8 daerah di Indonesia</li>
+
+          <li>Barista tersertifikasi SCAI & SCA</li>
+
+          <li>Ruang nyaman untuk kerja & santai</li>
+
+          <li>WiFi cepat 200 Mbps di seluruh area</li>
+
+          <li>Menu non-kopi & makanan pilihan tersedia</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <div id="menu">
+        <div class="menu-header">
+          <div>
+            <p class="section-eyebrow">Menu Kami</p>
+
+            <h2 class="section-title">Pilih favoritmu</h2>
+          </div>
+
+          <div class="menu-filters">
+            <button class="filter-btn active" data-filter="all">Semua</button>
+
+            <button class="filter-btn" data-filter="kopi">Kopi</button>
+
+            <button class="filter-btn" data-filter="non-kopi">Non-Kopi</button>
+
+            <button class="filter-btn" data-filter="makanan">Makanan</button>
+          </div>
+        </div>
+
+        <div class="menu-grid" id="menuGrid"></div>
+      </div>
+    </section>
+
+    <section id="reservasi">
+      <div class="reservasi-inner fade-up">
+        <p class="section-eyebrow">Reservasi</p>
+
+        <h2 class="section-title">Pesan meja sekarang</h2>
+
+        <p class="section-desc">
+          Pastikan pengalaman nongkrong kamu nyaman dengan memesan meja terlebih
+          dahulu — terutama di akhir pekan.
+        </p>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="nama"> Nama Lengkap </label>
+
+            <input type="text" id="nama" placeholder="Budi Santoso" />
+          </div>
+
+          <div class="form-group">
+            <label for="telp"> Nomor WhatsApp </label>
+
+            <input type="tel" id="telp" placeholder="08xxxxxxxxxx" />
+          </div>
+
+          <div class="form-group">
+            <label for="tgl"> Tanggal </label>
+
+            <input type="date" id="tgl" />
+          </div>
+
+          <div class="form-group">
+            <label for="jam"> Jam </label>
+
+            <select id="jam">
+              <option value="">Pilih jam</option>
+
+              <option>08:00</option>
+              <option>09:00</option>
+              <option>10:00</option>
+              <option>11:00</option>
+              <option>12:00</option>
+              <option>13:00</option>
+              <option>14:00</option>
+              <option>15:00</option>
+              <option>16:00</option>
+              <option>17:00</option>
+              <option>18:00</option>
+              <option>19:00</option>
+              <option>20:00</option>
+            </select>
+          </div>
+        </div>
+
+        <button
+          class="btn-primary"
+          onclick="submitReservasi()"
+          style="width: 100%; padding: 16px"
+        >
+          Konfirmasi Reservasi
+        </button>
+
+        <div id="form-msg">
+          ✅ Reservasi berhasil! Kami akan menghubungi kamu via WhatsApp untuk
+          konfirmasi.
+        </div>
+      </div>
+    </section>
+
+    <!-- bagian HTML masih berlanjut: galeri, testimoni, info, footer, script link -->
+
+    <script src="script.js"></script>
+  </body>
+</html>

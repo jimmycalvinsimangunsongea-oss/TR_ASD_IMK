@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin — Kopi Nusantara</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:       #0F0D0B;
+      --surface:  #1A1612;
+      --card:     #211D18;
+      --border:   #2E2820;
+      --gold:     #C8973A;
+      --gold-s:   #E8B96A;
+      --cream:    #F5EDD8;
+      --muted:    #7A6E60;
+      --text:     #EDE5D4;
+      --red:      #E05A3A;
+      --green:    #4CAF7D;
+      --blue:     #4A90D9;
+      --sidebar-w: 240px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; display: flex; min-height: 100vh; }
+
+    /* LOGIN */
+    #loginScreen {
+      position: fixed; inset: 0; z-index: 999;
+      background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .login-box {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 48px 40px; width: 380px;
+      position: relative; overflow: hidden;
+    }
+    .login-box::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+    .login-logo {
+      font-family: 'Space Mono', monospace; font-size: 1.1rem;
+      color: var(--gold); margin-bottom: 8px; text-align: center;
+    }
+    .login-sub { text-align: center; color: var(--muted); font-size: 0.82rem; margin-bottom: 32px; }
+    .login-label {
+      font-family: 'Space Mono', monospace; font-size: 0.65rem;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--muted); display: block; margin-bottom: 8px;
+    }
+    .login-input {
+      width: 100%; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; padding: 12px 14px; color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-size: 0.88rem;
+      outline: none; margin-bottom: 16px; transition: border-color 0.2s;
+    }
+    .login-input:focus { border-color: var(--gold); }
+    .login-btn {
+      width: 100%; padding: 13px; background: var(--gold); color: var(--bg);
+      border: none; border-radius: 6px; font-family: 'Space Mono', monospace;
+      font-size: 0.78rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; cursor: pointer; transition: background 0.2s;
+    }
+    .login-btn:hover { background: var(--gold-s); }
+    .login-hint { text-align: center; color: var(--muted); font-size: 0.75rem; margin-top: 16px; }
+    .login-hint span { color: var(--gold); }
+    #loginErr { color: var(--red); font-size: 0.8rem; text-align: center; margin-top: 8px; display: none; }
+
+    /* SIDEBAR */
+    #sidebar {
+      width: var(--sidebar-w); background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      position: fixed; top: 0; left: 0; bottom: 0; z-index: 50;
+      transform: translateX(0); transition: transform 0.3s;
+    }
+    .sidebar-logo {
+      padding: 24px 20px 20px;
+      font-family: 'Space Mono', monospace; font-size: 0.95rem;
+      color: var(--gold); border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .sidebar-nav { flex: 1; padding: 16px 0; overflow-y: auto; }
+    .nav-group-label {
+      font-family: 'Space Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--muted); padding: 12px 20px 6px;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 20px; cursor: pointer; border-radius: 0;
+      color: var(--muted); font-size: 0.85rem;
+      transition: color 0.2s, background 0.2s;
+      border-left: 3px solid transparent;
+    }
+    .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+    .nav-item.active { color: var(--gold); background: rgba(200,151,58,0.08); border-left-color: var(--gold); }
+    .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+    .sidebar-footer {
+      padding: 16px 20px; border-top: 1px solid var(--border);
+    }
+    .admin-info { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .admin-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), var(--gold-s));
+      display: flex; align-items: center; justify-content: center; font-size: 1rem;
+    }
+    .admin-name { font-size: 0.82rem; font-weight: 500; }
+    .admin-role { font-family: 'Space Mono', monospace; font-size: 0.62rem; color: var(--muted); }
+    .logout-btn {
+      width: 100%; padding: 9px; background: transparent;
+      border: 1px solid var(--border); color: var(--muted);
+      border-radius: 6px; cursor: pointer; font-size: 0.78rem;
+      font-family: 'Space Mono', monospace; letter-spacing: 0.08em;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .logout-btn:hover { border-color: var(--red); color: var(--red); }
+
+    /* MAIN */
+    #main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .topbar {
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 16px 32px; display: flex; align-items: center;
+      justify-content: space-between; position: sticky; top: 0; z-index: 40;
+    }
+    .topbar-title { font-size: 1rem; font-weight: 600; color: var(--cream); }
+    .topbar-right { display: flex; align-items: center; gap: 16px; }
+    .topbar-date { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--muted); }
+    .badge-notif {
+      background: var(--red); color: #fff;
+      font-family: 'Space Mono', monospace; font-size: 0.65rem;
+      padding: 3px 8px; border-radius: 100px;
+    }
+
+    /* CONTENT */
+    .page { padding: 28px 32px; display: none; }
+    .page.active { display: block; }
+
+    /* STAT CARDS */
+    .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+    .stat-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 20px 22px;
+      position: relative; overflow: hidden;
+    }
+    .stat-card::after {
+      content: attr(data-icon); position: absolute; right: 16px; top: 14px;
+      font-size: 1.8rem; opacity: 0.2;
+    }
+    .stat-label { font-family: 'Space Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .stat-value { font-size: 1.6rem; font-weight: 600; color: var(--cream); margin-bottom: 6px; }
+    .stat-delta { font-size: 0.75rem; }
+    .delta-up   { color: var(--green); }
+    .delta-down { color: var(--red); }
+
+    /* TABLE */
+    .section-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; overflow: hidden; margin-bottom: 20px;
+    }
+    .section-head {
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .section-head h3 { font-size: 0.9rem; font-weight: 600; color: var(--cream); }
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      font-family: 'Space Mono', monospace; font-size: 0.63rem;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); text-align: left;
+      padding: 12px 20px; border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    td { padding: 12px 20px; border-bottom: 1px solid var(--border); font-size: 0.84rem; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* STATUS BADGES */
+    .badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 100px;
+      font-family: 'Space Mono', monospace; font-size: 0.62rem;
+      letter-spacing: 0.06em; font-weight: 700;
+    }
+    .badge-confirmed { background: rgba(76,175,125,0.15); color: var(--green); border: 1px solid rgba(76,175,125,0.3); }
+    .badge-pending   { background: rgba(200,151,58,0.15); color: var(--gold); border: 1px solid rgba(200,151,58,0.3); }
+    .badge-cancelled { background: rgba(224,90,58,0.15);  color: var(--red);  border: 1px solid rgba(224,90,58,0.3); }
+    .badge-kopi      { background: rgba(200,151,58,0.12); color: var(--gold-s); border: 1px solid rgba(200,151,58,0.2); }
+    .badge-non-kopi  { background: rgba(76,175,125,0.12); color: #70D090; border: 1px solid rgba(76,175,125,0.2); }
+    .badge-makanan   { background: rgba(74,144,217,0.12); color: #7AB5E8; border: 1px solid rgba(74,144,217,0.2); }
+
+    /* BUTTONS */
+    .btn {
+      padding: 7px 14px; border-radius: 6px; cursor: pointer;
+      font-size: 0.78rem; font-family: 'Space Mono', monospace;
+      letter-spacing: 0.06em; border: none; transition: all 0.2s;
+    }
+    .btn-sm { padding: 5px 10px; font-size: 0.7rem; }
+    .btn-gold  { background: var(--gold); color: var(--bg); font-weight: 700; }
+    .btn-gold:hover  { background: var(--gold-s); }
+    .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+    .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+    .btn-danger { background: transparent; border: 1px solid rgba(224,90,58,0.3); color: var(--red); }
+    .btn-danger:hover { background: rgba(224,90,58,0.1); }
+    .btn-green { background: transparent; border: 1px solid rgba(76,175,125,0.3); color: var(--green); }
+    .btn-green:hover { background: rgba(76,175,125,0.1); }
+
+    /* ACTION ROW */
+    .action-row { display: flex; gap: 8px; }
+
+    /* SEARCH & FILTER ROW */
+    .toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .search-input {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; padding: 8px 14px; color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-size: 0.84rem;
+      outline: none; width: 220px; transition: border-color 0.2s;
+    }
+    .search-input:focus { border-color: var(--gold); }
+    .filter-select {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; padding: 8px 14px; color: var(--text);
+      font-size: 0.82rem; outline: none; cursor: pointer;
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+      display: none; align-items: center; justify-content: center; z-index: 200;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; width: 480px; max-width: 95vw;
+      max-height: 90vh; overflow-y: auto;
+      position: relative;
+    }
+    .modal-head {
+      padding: 20px 24px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; background: var(--card); z-index: 1;
+    }
+    .modal-head h3 { font-size: 0.95rem; font-weight: 600; color: var(--cream); }
+    .modal-close { background: none; border: none; color: var(--muted); font-size: 1.3rem; cursor: pointer; }
+    .modal-body { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+    .modal-foot { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1/-1; }
+    .form-label { font-family: 'Space Mono', monospace; font-size: 0.63rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+    .form-control {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; padding: 10px 12px; color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-size: 0.86rem;
+      outline: none; transition: border-color 0.2s; width: 100%;
+    }
+    .form-control:focus { border-color: var(--gold); }
+    select.form-control option { background: var(--card); }
+
+    /* MINI CHART */
+    .chart-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+    .chart-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+    .chart-title { font-family: 'Space Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+    .bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 80px; }
+    .bar-col { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+    .bar {
+      width: 100%; border-radius: 4px 4px 0 0;
+      background: linear-gradient(180deg, var(--gold-s), var(--gold));
+      transition: height 0.5s ease;
+    }
+    .bar-lbl { font-family: 'Space Mono', monospace; font-size: 0.58rem; color: var(--muted); }
+    .donut-wrap { display: flex; align-items: center; gap: 20px; }
+    .donut-legend { display: flex; flex-direction: column; gap: 8px; }
+    .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+    /* TOAST */
+    #toast {
+      position: fixed; bottom: 28px; right: 28px; z-index: 500;
+      background: var(--green); color: #fff;
+      font-family: 'Space Mono', monospace; font-size: 0.75rem;
+      padding: 10px 20px; border-radius: 6px;
+      transform: translateY(10px); opacity: 0;
+      transition: all 0.3s; pointer-events: none;
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+    #toast.error { background: var(--red); }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      #sidebar { transform: translateX(-100%); }
+      #sidebar.open { transform: translateX(0); }
+      #main { margin-left: 0; }
+      .stat-grid { grid-template-columns: 1fr 1fr; }
+      .chart-wrap { grid-template-columns: 1fr; }
+      .topbar { padding: 14px 16px; }
+      .page { padding: 20px 16px; }
+    }
+    @media (max-width: 560px) {
+      .stat-grid { grid-template-columns: 1fr; }
+    }
+
+    /* EMPTY STATE */
+    .empty-state {
+      text-align: center; padding: 48px 20px;
+      color: var(--muted); font-size: 0.85rem;
+    }
+    .empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">☕ Kopi Nusantara</div>
+    <div class="login-sub">Panel Admin — Masuk untuk melanjutkan</div>
+    <label class="login-label">Username</label>
+    <input class="login-input" id="loginUser" type="text" placeholder="admin" value="admin"/>
+    <label class="login-label">Password</label>
+    <input class="login-input" id="loginPass" type="password" placeholder="••••••" value="admin123"/>
+    <button class="login-btn" onclick="doLogin()">Masuk</button>
+    <div class="login-hint">Gunakan: username <span>admin</span> / password <span>admin123</span></div>
+    <div id="loginErr">❌ Username atau password salah.</div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div class="sidebar-logo">☕ <span>Admin Panel</span></div>
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">Utama</div>
+    <div class="nav-item active" onclick="showPage('dashboard', this)"><span class="nav-icon">📊</span> Dashboard</div>
+    <div class="nav-group-label">Kelola</div>
+    <div class="nav-item" onclick="showPage('menu', this)"><span class="nav-icon">☕</span> Menu</div>
+    <div class="nav-item" onclick="showPage('reservasi', this)"><span class="nav-icon">📅</span> Reservasi</div>
+    <div class="nav-item" onclick="showPage('ulasan', this)"><span class="nav-icon">⭐</span> Ulasan</div>
+    <div class="nav-group-label">Pengaturan</div>
+    <div class="nav-item" onclick="showPage('pengaturan', this)"><span class="nav-icon">⚙️</span> Pengaturan</div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="admin-info">
+      <div class="admin-avatar">👤</div>
+      <div><div class="admin-name">Administrator</div><div class="admin-role">Super Admin</div></div>
+    </div>
+    <button class="logout-btn" onclick="doLogout()">↩ Keluar</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button id="menuToggle" onclick="toggleSidebar()" style="background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer;display:none">☰</button>
+      <span class="topbar-title" id="topbarTitle">Dashboard</span>
+    </div>
+    <div class="topbar-right">
+      <span class="topbar-date" id="topbarDate"></span>
+      <span class="badge-notif" id="pendingBadge">0 pending</span>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="stat-grid">
+      <div class="stat-card" data-icon="💰">
+        <div class="stat-label">Pendapatan Hari Ini</div>
+        <div class="stat-value" id="statRevenue">Rp 0</div>
+        <div class="stat-delta delta-up">↑ 12% dari kemarin</div>
+      </div>
+      <div class="stat-card" data-icon="📅">
+        <div class="stat-label">Reservasi Hari Ini</div>
+        <div class="stat-value" id="statReservasi">0</div>
+        <div class="stat-delta delta-up">↑ 3 baru</div>
+      </div>
+      <div class="stat-card" data-icon="☕">
+        <div class="stat-label">Total Menu Aktif</div>
+        <div class="stat-value" id="statMenu">0</div>
+        <div class="stat-delta" style="color:var(--muted)">— tidak ada perubahan</div>
+      </div>
+      <div class="stat-card" data-icon="⭐">
+        <div class="stat-label">Rating Rata-rata</div>
+        <div class="stat-value">4.9</div>
+        <div class="stat-delta delta-up">↑ 0.1 bulan ini</div>
+      </div>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-card">
+        <div class="chart-title">Pesanan 7 Hari Terakhir</div>
+        <div class="bar-chart" id="barChart"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Komposisi Menu</div>
+        <div class="donut-wrap">
+          <svg width="80" height="80" viewBox="0 0 80 80">
+            <circle cx="40" cy="40" r="30" fill="none" stroke="var(--border)" stroke-width="14"/>
+            <circle cx="40" cy="40" r="30" fill="none" stroke="var(--gold)" stroke-width="14"
+              stroke-dasharray="94 94" stroke-dashoffset="0" transform="rotate(-90 40 40)"/>
+            <circle cx="40" cy="40" r="30" fill="none" stroke="#4CAF7D" stroke-width="14"
+              stroke-dasharray="56 132" stroke-dashoffset="-94" transform="rotate(-90 40 40)"/>
+            <circle cx="40" cy="40" r="30" fill="none" stroke="#4A90D9" stroke-width="14"
+              stroke-dasharray="38 150" stroke-dashoffset="-150" transform="rotate(-90 40 40)"/>
+          </svg>
+          <div class="donut-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div> Kopi (50%)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#4CAF7D"></div> Non-Kopi (30%)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#4A90D9"></div> Makanan (20%)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-head">
+        <h3>Reservasi Terbaru</h3>
+        <button class="btn btn-ghost btn-sm" onclick="showPage('reservasi', document.querySelector('.nav-item:nth-child(4)'))">Lihat semua →</button>
+      </div>
+      <div id="dashReservasiTable"></div>
+    </div>
+  </div>
+
+  <!-- MENU -->
+  <div class="page" id="page-menu">
+    <div class="section-card">
+      <div class="section-head">
+        <h3>Daftar Menu</h3>
+        <div class="toolbar">
+          <input class="search-input" id="menuSearch" placeholder="🔍 Cari menu..." oninput="renderMenuTable()"/>
+          <select class="filter-select" id="menuFilter" onchange="renderMenuTable()">
+            <option value="all">Semua</option>
+            <option value="kopi">Kopi</option>
+            <option value="non-kopi">Non-Kopi</option>
+            <option value="makanan">Makanan</option>
+          </select>
+          <button class="btn btn-gold" onclick="openMenuModal()">+ Tambah Menu</button>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Nama</th><th>Kategori</th><th>Harga</th><th>Status</th><th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="menuTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- RESERVASI -->
+  <div class="page" id="page-reservasi">
+    <div class="section-card">
+      <div class="section-head">
+        <h3>Daftar Reservasi</h3>
+        <div class="toolbar">
+          <input class="search-input" id="resSearch" placeholder="🔍 Cari nama/tanggal..." oninput="renderResTable()"/>
+          <select class="filter-select" id="resFilter" onchange="renderResTable()">
+            <option value="all">Semua Status</option>
+            <option value="pending">Pending</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+          <button class="btn btn-gold" onclick="openResModal()">+ Tambah</button>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr><th>#</th><th>Nama</th><th>Tanggal</th><th>Jam</th><th>Tamu</th><th>Area</th><th>Status</th><th>Aksi</th></tr>
+        </thead>
+        <tbody id="resTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ULASAN -->
+  <div class="page" id="page-ulasan">
+    <div class="section-card">
+      <div class="section-head">
+        <h3>Ulasan Pelanggan</h3>
+      </div>
+      <table>
+        <thead>
+          <tr><th>#</th><th>Nama</th><th>Rating</th><th>Komentar</th><th>Tanggal</th><th>Aksi</th></tr>
+        </thead>
+        <tbody id="ulasanTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PENGATURAN -->
+  <div class="page" id="page-pengaturan">
+    <div class="section-card" style="max-width:520px">
+      <div class="section-head"><h3>Informasi Toko</h3></div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Nama Toko</label>
+          <input class="form-control" value="Kopi Nusantara"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Alamat</label>
+          <input class="form-control" value="Jl. Diponegoro No. 42, Salatiga"/>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Telepon</label>
+            <input class="form-control" value="0812-3456-7890"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input class="form-control" value="halo@kopinusantara.id"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Buka (Weekday)</label>
+            <input class="form-control" value="07:00"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tutup (Weekday)</label>
+            <input class="form-control" value="22:00"/>
+          </div>
+        </div>
+        <button class="btn btn-gold" style="width:100%" onclick="showToast('✅ Pengaturan berhasil disimpan!')">Simpan Perubahan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL MENU -->
+<div class="modal-overlay" id="menuModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="menuModalTitle">Tambah Menu</h3>
+      <button class="modal-close" onclick="closeModal('menuModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="menuEditId"/>
+      <div class="form-row">
+        <div class="form-group full">
+          <label class="form-label">Nama Menu</label>
+          <input class="form-control" id="mNama" placeholder="Contoh: Espresso Gayo"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Kategori</label>
+          <select class="form-control" id="mKat">
+            <option value="kopi">Kopi</option>
+            <option value="non-kopi">Non-Kopi</option>
+            <option value="makanan">Makanan</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Harga (Rp)</label>
+          <input class="form-control" id="mHarga" type="number" placeholder="28000"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Emoji / Icon</label>
+          <input class="form-control" id="mEmoji" placeholder="☕"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Badge</label>
+          <select class="form-control" id="mBadge">
+            <option value="">— Tidak ada —</option>
+            <option value="hot">🔥 Terlaris</option>
+            <option value="new">✨ Baru</option>
+            <option value="fav">⭐ Favorit</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Deskripsi</label>
+          <textarea class="form-control" id="mDesc" rows="3" placeholder="Deskripsi singkat menu..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-control" id="mStatus">
+            <option value="aktif">Aktif</option>
+            <option value="nonaktif">Non-Aktif</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('menuModal')">Batal</button>
+      <button class="btn btn-gold" onclick="saveMenu()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL RESERVASI -->
+<div class="modal-overlay" id="resModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="resModalTitle">Tambah Reservasi</h3>
+      <button class="modal-close" onclick="closeModal('resModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="resEditId"/>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nama Tamu</label>
+          <input class="form-control" id="rNama" placeholder="Nama pelanggan"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">WhatsApp</label>
+          <input class="form-control" id="rTelp" placeholder="08xxxxxxxxxx"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tanggal</label>
+          <input class="form-control" id="rTgl" type="date"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Jam</label>
+          <select class="form-control" id="rJam">
+            <option>08:00</option><option>09:00</option><option>10:00</option>
+            <option>11:00</option><option>12:00</option><option>13:00</option>
+            <option>14:00</option><option>15:00</option><option>16:00</option>
+            <option>17:00</option><option>18:00</option><option>19:00</option>
+            <option>20:00</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Jumlah Tamu</label>
+          <select class="form-control" id="rKursi">
+            <option>1 orang</option><option>2 orang</option><option>3 orang</option>
+            <option>4 orang</option><option>5–8 orang</option><option>9+ orang</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Area</label>
+          <select class="form-control" id="rArea">
+            <option>Indoor</option><option>Outdoor</option><option>VIP Room</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Status</label>
+          <select class="form-control" id="rStatus">
+            <option value="pending">Pending</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Catatan</label>
+          <textarea class="form-control" id="rCatatan" rows="2" placeholder="Catatan khusus..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('resModal')">Batal</button>
+      <button class="btn btn-gold" onclick="saveRes()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+/* === DATA === */
+let menuItems = [
+  { id:1, name:'Espresso Gayo',    cat:'kopi',     price:28000, emoji:'🔥', badge:'hot', desc:'Single origin Aceh Tengah. Bold, asam bersih, karamel.',     status:'aktif' },
+  { id:2, name:'Pour Over Flores', cat:'kopi',     price:35000, emoji:'☕', badge:'fav', desc:'Floral, fruity, aftertaste coklat gelap. V60 15 menit.',      status:'aktif' },
+  { id:3, name:'Cold Brew Toraja', cat:'kopi',     price:32000, emoji:'🧊', badge:null,  desc:'Direndam 18 jam, body tebal, manis alami.',                   status:'aktif' },
+  { id:4, name:'Kopi Susu Aren',   cat:'kopi',     price:30000, emoji:'🥛', badge:'fav', desc:'Espresso + susu segar + gula aren lokal.',                    status:'aktif' },
+  { id:5, name:'Matcha Latte',     cat:'non-kopi', price:33000, emoji:'🍵', badge:'new', desc:'Matcha grade ceremonial Jepang, susu oat creamy.',            status:'aktif' },
+  { id:6, name:'Coklat Flores',    cat:'non-kopi', price:30000, emoji:'🍫', badge:null,  desc:'Dark chocolate 72% dari Flores, hangat & kaya rasa.',        status:'aktif' },
+  { id:7, name:'Teh Pandan Latte', cat:'non-kopi', price:28000, emoji:'🌿', badge:'new', desc:'Teh hijau lokal + pandan segar + susu.',                      status:'aktif' },
+  { id:8, name:'Croissant Butter', cat:'makanan',  price:22000, emoji:'🥐', badge:null,  desc:'Dipanggang tiap pagi, renyah luar lembut dalam.',             status:'aktif' },
+  { id:9, name:'Avocado Toast',    cat:'makanan',  price:42000, emoji:'🥑', badge:'hot', desc:'Sourdough lokal + alpukat + telur poach + rempah.',           status:'aktif' },
+  { id:10,name:'Banana Cake',      cat:'makanan',  price:25000, emoji:'🍰', badge:null,  desc:'Pisang cavendish lokal, panggang lambat, lembut sempurna.',   status:'aktif' },
+];
+
+let reservasiItems = [
+  { id:1, nama:'Ahmad Rizki',   telp:'08123456789', tgl:'2024-12-20', jam:'10:00', kursi:'2 orang', area:'Indoor',   status:'confirmed', catatan:''              },
+  { id:2, nama:'Siti Rahayu',   telp:'08234567890', tgl:'2024-12-20', jam:'13:00', kursi:'4 orang', area:'Outdoor',  status:'pending',   catatan:'Bawa bayi'     },
+  { id:3, nama:'Bima Pratama',  telp:'08345678901', tgl:'2024-12-21', jam:'14:00', kursi:'3 orang', area:'VIP Room', status:'confirmed', catatan:'Ulang tahun'   },
+  { id:4, nama:'Dewi Anggraini',telp:'08456789012', tgl:'2024-12-21', jam:'11:00', kursi:'2 orang', area:'Indoor',   status:'pending',   catatan:''              },
+  { id:5, nama:'Reza Firmansyah',telp:'08567890123',tgl:'2024-12-22', jam:'19:00', kursi:'5–8 orang',area:'Outdoor', status:'cancelled', catatan:'Acara dibatal' },
+];
+
+let ulasanItems = [
+  { id:1, nama:'Ahmad Rizki',    rating:5, komentar:'Kopi Gayo-nya beda banget! Asamnya bersih, floral, bikin nagih.',        tgl:'2024-12-10' },
+  { id:2, nama:'Siti Rahayu',    rating:5, komentar:'Cold brew-nya juara! Barista juga ramah dan bisa jelasin tiap kopi.',     tgl:'2024-12-12' },
+  { id:3, nama:'Bima Pratama',   rating:5, komentar:'WiFi kencang, suasana profesional tapi santai. Kopi selalu konsisten.',   tgl:'2024-12-15' },
+  { id:4, nama:'Lina Kusuma',    rating:4, komentar:'Matcha Latte-nya enak banget! Tempatnya cozy dan harganya terjangkau.',   tgl:'2024-12-18' },
+];
+
+let nextMenuId = 11;
+let nextResId  = 6;
+
+/* === LOGIN === */
+function doLogin() {
+  const u = document.getElementById('loginUser').value;
+  const p = document.getElementById('loginPass').value;
+  if (u === 'admin' && p === 'admin123') {
+    document.getElementById('loginScreen').style.display = 'none';
+    initDashboard();
+  } else {
+    document.getElementById('loginErr').style.display = 'block';
+  }
+}
+document.getElementById('loginPass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+
+function doLogout() {
+  if (confirm('Yakin ingin keluar?')) location.reload();
+}
+
+/* === SIDEBAR === */
+function showPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  if (el) el.classList.add('active');
+  const titles = { dashboard:'Dashboard', menu:'Kelola Menu', reservasi:'Kelola Reservasi', ulasan:'Ulasan Pelanggan', pengaturan:'Pengaturan' };
+  document.getElementById('topbarTitle').textContent = titles[id] || id;
+  if (id === 'menu')      renderMenuTable();
+  if (id === 'reservasi') renderResTable();
+  if (id === 'ulasan')    renderUlasan();
+  if (window.innerWidth <= 900) document.getElementById('sidebar').classList.remove('open');
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+/* === DATE === */
+function setDate() {
+  const d = new Date();
+  document.getElementById('topbarDate').textContent =
+    d.toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+}
+
+/* === INIT === */
+function initDashboard() {
+  setDate();
+  updateStats();
+  renderBarChart();
+  renderDashReservasi();
+  setInterval(setDate, 60000);
+  if (window.innerWidth <= 900) document.getElementById('menuToggle').style.display = 'block';
+}
+
+function updateStats() {
+  document.getElementById('statRevenue').textContent = 'Rp ' + (1_240_000).toLocaleString('id-ID');
+  document.getElementById('statReservasi').textContent = reservasiItems.filter(r => r.status !== 'cancelled').length;
+  document.getElementById('statMenu').textContent = menuItems.filter(m => m.status === 'aktif').length;
+  const pending = reservasiItems.filter(r => r.status === 'pending').length;
+  document.getElementById('pendingBadge').textContent = pending + ' pending';
+}
+
+/* === BAR CHART === */
+function renderBarChart() {
+  const days = ['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
+  const vals = [18, 24, 20, 30, 27, 42, 35];
+  const max = Math.max(...vals);
+  document.getElementById('barChart').innerHTML = days.map((d,i) => `
+    <div class="bar-col">
+      <div class="bar" style="height:${Math.round((vals[i]/max)*70)+10}px"></div>
+      <div class="bar-lbl">${d}</div>
+    </div>
+  `).join('');
+}
+
+/* === DASH RESERVASI === */
+function renderDashReservasi() {
+  const rows = reservasiItems.slice(0,4).map((r,i) => `
+    <tr>
+      <td>${i+1}</td>
+      <td>${r.nama}</td>
+      <td>${r.tgl}</td>
+      <td>${r.jam}</td>
+      <td><span class="badge badge-${r.status}">${r.status}</span></td>
+    </tr>
+  `).join('');
+  document.getElementById('dashReservasiTable').innerHTML =
+    `<table><thead><tr><th>#</th><th>Nama</th><th>Tanggal</th><th>Jam</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+/* === MENU TABLE === */
+function renderMenuTable() {
+  const search = document.getElementById('menuSearch').value.toLowerCase();
+  const filter = document.getElementById('menuFilter').value;
+  let items = menuItems.filter(m =>
+    (filter === 'all' || m.cat === filter) &&
+    m.name.toLowerCase().includes(search)
+  );
+  const body = document.getElementById('menuTableBody');
+  if (!items.length) {
+    body.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">🔍</div>Tidak ada menu ditemukan</div></td></tr>`;
+    return;
+  }
+  body.innerHTML = items.map((m, i) => `
+    <tr>
+      <td>${i+1}</td>
+      <td>${m.emoji} ${m.name}</td>
+      <td><span class="badge badge-${m.cat}">${m.cat}</span></td>
+      <td>Rp ${m.price.toLocaleString('id-ID')}</td>
+      <td>
+        <span class="badge ${m.status==='aktif' ? 'badge-confirmed':'badge-cancelled'}">
+          ${m.status}
+        </span>
+      </td>
+      <td><div class="action-row">
+        <button class="btn btn-ghost btn-sm" onclick="editMenu(${m.id})">✏️ Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteMenu(${m.id})">🗑️</button>
+      </div></td>
+    </tr>
+  `).join('');
+}
+
+function openMenuModal(id = null) {
+  document.getElementById('menuModalTitle').textContent = id ? 'Edit Menu' : 'Tambah Menu';
+  document.getElementById('menuEditId').value = id || '';
+  if (!id) {
+    ['mNama','mDesc','mEmoji'].forEach(x => document.getElementById(x).value = '');
+    document.getElementById('mHarga').value = '';
+    document.getElementById('mKat').value = 'kopi';
+    document.getElementById('mBadge').value = '';
+    document.getElementById('mStatus').value = 'aktif';
+  }
+  document.getElementById('menuModal').classList.add('open');
+}
+
+function editMenu(id) {
+  const m = menuItems.find(x => x.id === id);
+  if (!m) return;
+  openMenuModal(id);
+  document.getElementById('mNama').value  = m.name;
+  document.getElementById('mKat').value   = m.cat;
+  document.getElementById('mHarga').value = m.price;
+  document.getElementById('mEmoji').value = m.emoji;
+  document.getElementById('mBadge').value = m.badge || '';
+  document.getElementById('mDesc').value  = m.desc;
+  document.getElementById('mStatus').value = m.status;
+}
+
+function saveMenu() {
+  const id    = document.getElementById('menuEditId').value;
+  const nama  = document.getElementById('mNama').value.trim();
+  const harga = parseInt(document.getElementById('mHarga').value);
+  if (!nama || !harga) { showToast('❌ Nama dan harga wajib diisi!', true); return; }
+  const data = {
+    name: nama, cat: document.getElementById('mKat').value,
+    price: harga, emoji: document.getElementById('mEmoji').value || '☕',
+    badge: document.getElementById('mBadge').value || null,
+    desc: document.getElementById('mDesc').value,
+    status: document.getElementById('mStatus').value,
+  };
+  if (id) {
+    const idx = menuItems.findIndex(x => x.id === parseInt(id));
+    menuItems[idx] = { ...menuItems[idx], ...data };
+    showToast('✅ Menu berhasil diperbarui!');
+  } else {
+    menuItems.push({ id: nextMenuId++, ...data });
+    showToast('✅ Menu berhasil ditambahkan!');
+  }
+  closeModal('menuModal');
+  renderMenuTable();
+  updateStats();
+}
+
+function deleteMenu(id) {
+  if (!confirm('Hapus menu ini?')) return;
+  menuItems = menuItems.filter(m => m.id !== id);
+  renderMenuTable();
+  updateStats();
+  showToast('🗑️ Menu dihapus.');
+}
+
+/* === RESERVASI TABLE === */
+function renderResTable() {
+  const search = document.getElementById('resSearch').value.toLowerCase();
+  const filter = document.getElementById('resFilter').value;
+  let items = reservasiItems.filter(r =>
+    (filter === 'all' || r.status === filter) &&
+    (r.nama.toLowerCase().includes(search) || r.tgl.includes(search))
+  );
+  const body = document.getElementById('resTableBody');
+  if (!items.length) {
+    body.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">📅</div>Tidak ada reservasi ditemukan</div></td></tr>`;
+    return;
+  }
+  body.innerHTML = items.map((r, i) => `
+    <tr>
+      <td>${i+1}</td>
+      <td>
+        <div style="font-weight:500">${r.nama}</div>
+        <div style="color:var(--muted);font-size:0.75rem">${r.telp}</div>
+      </td>
+      <td>${r.tgl}</td>
+      <td>${r.jam}</td>
+      <td>${r.kursi}</td>
+      <td>${r.area}</td>
+      <td><span class="badge badge-${r.status}">${r.status}</span></td>
+      <td>
+        <div class="action-row">
+          ${r.status==='pending' ? `<button class="btn btn-green btn-sm" onclick="confirmRes(${r.id})">✓</button>` : ''}
+          <button class="btn btn-ghost btn-sm" onclick="editRes(${r.id})">✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteRes(${r.id})">🗑️</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function confirmRes(id) {
+  const r = reservasiItems.find(x => x.id === id);
+  if (r) { r.status = 'confirmed'; renderResTable(); updateStats(); showToast('✅ Reservasi dikonfirmasi!'); }
+}
+
+function openResModal(id = null) {
+  document.getElementById('resModalTitle').textContent = id ? 'Edit Reservasi' : 'Tambah Reservasi';
+  document.getElementById('resEditId').value = id || '';
+  if (!id) {
+    ['rNama','rTelp','rCatatan'].forEach(x => document.getElementById(x).value = '');
+    document.getElementById('rTgl').value = new Date().toISOString().split('T')[0];
+    document.getElementById('rStatus').value = 'pending';
+  }
+  document.getElementById('resModal').classList.add('open');
+}
+
+function editRes(id) {
+  const r = reservasiItems.find(x => x.id === id);
+  if (!r) return;
+  openResModal(id);
+  document.getElementById('rNama').value    = r.nama;
+  document.getElementById('rTelp').value    = r.telp;
+  document.getElementById('rTgl').value     = r.tgl;
+  document.getElementById('rJam').value     = r.jam;
+  document.getElementById('rKursi').value   = r.kursi;
+  document.getElementById('rArea').value    = r.area;
+  document.getElementById('rStatus').value  = r.status;
+  document.getElementById('rCatatan').value = r.catatan;
+}
+
+function saveRes() {
+  const id   = document.getElementById('resEditId').value;
+  const nama = document.getElementById('rNama').value.trim();
+  if (!nama) { showToast('❌ Nama wajib diisi!', true); return; }
+  const data = {
+    nama, telp: document.getElementById('rTelp').value,
+    tgl:  document.getElementById('rTgl').value,
+    jam:  document.getElementById('rJam').value,
+    kursi:document.getElementById('rKursi').value,
+    area: document.getElementById('rArea').value,
+    status: document.getElementById('rStatus').value,
+    catatan:document.getElementById('rCatatan').value,
+  };
+  if (id) {
+    const idx = reservasiItems.findIndex(x => x.id === parseInt(id));
+    reservasiItems[idx] = { ...reservasiItems[idx], ...data };
+    showToast('✅ Reservasi diperbarui!');
+  } else {
+    reservasiItems.push({ id: nextResId++, ...data });
+    showToast('✅ Reservasi ditambahkan!');
+  }
+  closeModal('resModal');
+  renderResTable();
+  updateStats();
+}
+
+function deleteRes(id) {
+  if (!confirm('Hapus reservasi ini?')) return;
+  reservasiItems = reservasiItems.filter(r => r.id !== id);
+  renderResTable();
+  updateStats();
+  showToast('🗑️ Reservasi dihapus.');
+}
+
+/* === ULASAN === */
+function renderUlasan() {
+  document.getElementById('ulasanTableBody').innerHTML = ulasanItems.map((u, i) => `
+    <tr>
+      <td>${i+1}</td>
+      <td>${u.nama}</td>
+      <td>${'★'.repeat(u.rating)}<span style="color:var(--muted)">${'★'.repeat(5-u.rating)}</span></td>
+      <td style="max-width:300px;color:var(--muted);font-size:0.82rem">${u.komentar}</td>
+      <td style="white-space:nowrap">${u.tgl}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteUlasan(${u.id})">🗑️</button></td>
+    </tr>
+  `).join('');
+}
+
+function deleteUlasan(id) {
+  if (!confirm('Hapus ulasan ini?')) return;
+  ulasanItems = ulasanItems.filter(u => u.id !== id);
+  renderUlasan();
+  showToast('🗑️ Ulasan dihapus.');
+}
+
+/* === MODAL === */
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+/* === TOAST === */
+function showToast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = isError ? 'error' : '';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+/* === RESPONSIVE TOGGLE === */
+if (window.innerWidth <= 900) {
+  document.getElementById('menuToggle').style.display = 'block';
+}
+</script>
+</body>
+</html>
